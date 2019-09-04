@@ -3,6 +3,8 @@ CLANG ?= clang
 LLC ?= llc
 ARCH := $(subst x86_64,x86,$(shell arch))
 
+DEVICE ?= enp0s8
+
 BIN := xdp_icmp_drop.o
 CLANG_FLAGS = -I. -I$(KDIR)/arch/$(ARCH)/include \
 -I$(KDIR)/arch/$(ARCH)/include/generated \

@@ -24,6 +24,7 @@ static inline int parse_ipv4(void *data, __u64 nh_off, void *data_end, __be32 *s
     return iph->protocol;
 }
 
+// Variadic macro to wrap around bpf_trace_printk
 #define bpf_printk(fmt, ...) \
 ({ \
     char ____fmt[] = fmt; \
@@ -34,17 +35,17 @@ static inline int parse_ipv4(void *data, __u64 nh_off, void *data_end, __be32 *s
 /*
 Structure of the XDP context
 struct xdp_md {
-    __u32 data;             // Packet contents between here
-    __u32 data_end;         // And here
+    __u32 data;             // Packet contents between here...
+    __u32 data_end;         // ...and here
     __u32 data_meta;
-    // Below access go through struct xdp_rxq_info
+    // See struct xdp_rxq_info
     __u32 ingress_ifindex;  // xq->dev->ifindex
     __u32 rx_queue_index;   // rxq->queue_index
 };
 */
 
 SEC("prog")
-int xdp_dummy(struct xdp_md *ctx)
+int xdp_icmp_drop(struct xdp_md *ctx)
 {
     void *data_end = (void *)(long)ctx->data_end;
     void *data = (void *)(long)ctx->data;
@@ -65,7 +66,7 @@ int xdp_dummy(struct xdp_md *ctx)
     __u64 nh_off;
     int ipproto;
 
-    bpf_printk("xdp_dummy\n");
+    bpf_printk("xdp_icmp_drop\n");
 
     nh_off = sizeof(*eth);
     if (data + nh_off > data_end)
@@ -88,9 +89,9 @@ int xdp_dummy(struct xdp_md *ctx)
         goto pass;
 
     ipproto = parse_ipv4(data, nh_off, data_end, &src_ip, &dest_ip);
-    bpf_printk("got ip proto %d\n", ipproto);
     // Drop ICMP packets
     if (ipproto == 1)
+        bpf_printk("rcvd IP packet with protocol %d, dropping\n", ipproto);
         return XDP_DROP;
 
 pass:
