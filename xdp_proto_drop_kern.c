@@ -83,9 +83,12 @@ int xdp_icmp_drop(struct xdp_md *ctx) {
   match = bpf_map_lookup_elem(&xdp_block_protocols, &ipproto);
   if (!match)
     return XDP_PASS;
-  if (*match == 1)
+  if (*match == 1) {
     bpf_printk("rcvd IP packet with protocol %d, dropping\n", ipproto);
-  return XDP_DROP;
+    return XDP_DROP;
+  }
+  if (*match == 0)
+    goto pass;
 
 pass:
   return XDP_PASS;

@@ -16,9 +16,8 @@ protocols can be updated dynamically.
 
 int main(int argc, char *argv[]) {
 
-  int proto = atoi(argv[1]);
-  char *filename = argv[2];
-  char *device = argv[3];
+  char *filename = argv[1];
+  char *device = argv[2];
 
   printf("got arg %s\n", argv[1]);
   struct bpf_prog_load_attr prog_load_attr = {
@@ -60,7 +59,5 @@ int main(int argc, char *argv[]) {
           "%d:%s\n",
           device, ifindex, errno, strerror(errno));
 
-  // detach the xdp program
-  // bpf_set_link_xdp_fd(ifindex, -1, 0);
   return 0;
 }
