@@ -47,6 +47,8 @@ int main(int argc, char *argv[]) {
   if (!ifindex)
     error(1, errno, "unknown interface %s\n", device);
 
+  printf("got ifindex %d\n", ifindex);
+
   // attach the xdp program to the device
   if (bpf_set_link_xdp_fd(ifindex, prog_fd, 0) < 0)
     error(1, errno,

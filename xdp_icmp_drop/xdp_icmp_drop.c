@@ -42,7 +42,7 @@ struct xdp_md {
 };
 */
 
-SEC("icmp_drop")
+SEC("prog")
 int xdp_icmp_drop(struct xdp_md *ctx) {
   void *data_end = (void *)(long)ctx->data_end;
   void *data = (void *)(long)ctx->data;
